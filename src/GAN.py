@@ -2,10 +2,9 @@ from keras.datasets import mnist, cifar10
 from keras.layers import Input, Dense, Reshape, Flatten
 from keras.layers import BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
-from keras.models import Sequential, Model, model_from_json
+from keras.models import Sequential, Model
 from keras.optimizers import Adam
 
-import json
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -146,7 +145,10 @@ class GAN(object):
     #                       GAN training/generating                        #
     ########################################################################
 
-    def train(self, X_train, iterations, batch_size=64, k=1, sample_interval=100):
+    def train(self, X_train, iterations, batch_size=64,
+                                         k=1,
+                                         sample_interval=100,
+                                         verbose=True):
         """Train the Generative Adversarial Network with given samples.
 
             Parameters
@@ -166,7 +168,14 @@ class GAN(object):
             sample_interval : int, default=100
                 Iteration interval at which to output randomly generated
                 results of generator.
+
+            verbose : boolean, default=True
+                If verbose is set, print current status.
             """
+        # Generated image samples
+        if sample_interval:
+            self.sample_images("../images/{}/{}.png".format(
+                               self.__class__.__name__, 0))
 
         # Rescale -1 to 1
         X_train = X_train / (X_train.max() / 2.) - 1.
@@ -211,11 +220,14 @@ class GAN(object):
             loss_g = self.combined.train_on_batch(noise, y_real)
 
             # Plot progress
-            self.progress(loss_d[0], loss_g, 100*loss_d[1], iteration, iterations)
+            if verbose:
+                self.progress(loss_d[0], loss_g, 100*loss_d[1],
+                              iteration, iterations)
 
             # If at save interval => save generated image samples
-            if iteration % sample_interval == 0:
-                self.sample_images("../images/{}.png".format(iteration))
+            if sample_interval and (iteration % sample_interval == 0):
+                self.sample_images("../images/{}/{}.png".format(
+                                   self.__class__.__name__, iteration))
 
     def generate(self, noise=None, amount=5):
         """Generate output from given noise.
@@ -352,8 +364,8 @@ class GAN(object):
 
         # Compute variables to use in format string
         progress = round(40*iteration/total)
-        p_string = '#'*progress
-        r_string = '.'*(40-progress)
+        p_str = '#'*progress
+        r_str = '.'*(40-progress)
         progress = 100*iteration/total
         length = len(str(total))
 
@@ -363,16 +375,16 @@ class GAN(object):
 Discriminator accuracy: {acc:>6.2f}%
 Discriminator     loss: {d_loss:.5f}
 Generator         loss: {g_loss:.5f}
-Progress: [{p_string}{r_string}] {iteration:{length}}/{total} = {progress:>6.2f}%"""
+Progress: [{p_str}{r_str}] {iteration:{length}}/{total} = {progress:>6.2f}%"""
              )
 
 
 if __name__ == '__main__':
     # Load the dataset
 
-    #(X_train, y_train), (X_test, y_test) = mnist.load_data()
-    (X_train, y_train), (X_test, y_test) = cifar10.load_data()
+    (X_train, y_train), (X_test, y_test) = mnist.load_data()
+    #(X_train, y_train), (X_test, y_test) = cifar10.load_data()
 
-    gan = GAN(dim_input_d=(32, 32, 3))
+    gan = GAN(dim_input_g=2, dim_input_d=(28, 28))
     gan.train(X_train, iterations=10000, sample_interval=100)
     gan.save('../saved/GAN_g.h5', '../saved/GAN_d.h5', '../saved/GAN_c.h5')
