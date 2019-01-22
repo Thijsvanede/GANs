@@ -26,112 +26,129 @@ The `GAN` class is used for training and predicting of GANs. This class also act
 ### API
 
 #### __init__()
-```python
-Generative Adversarial Network.
+```
+__init__(self, dim_input_g=100,
+                   dim_input_d=(28, 28),
+                   optimizer=Adam(beta_1=0.5)):
 
-    Parameters
-    ----------
-    dim_input_g : int, default=100
-        Dimension of generator input.
+    Generative Adversarial Network.
 
-    dim_input_d : tuple, default=(28, 28)
-        Dimension of discriminator input.
+        Parameters
+        ----------
+        dim_input_g : int, default=100
+            Dimension of generator input.
 
-    optimizer : keras.optimizer, default=Adam(beta_1=0.5)
-        Optimiser to use for training.
+        dim_input_d : tuple, default=(28, 28)
+            Dimension of discriminator input.
+
+        optimizer : keras.optimizer, default=Adam(beta_1=0.5)
+            Optimiser to use for training.
 ```
 
 #### train()
-```python
-Train the Generative Adversarial Network with given samples.
+```
+ttrain(self, X_train, iterations, batch_size=64,
+                                     k=1,
+                                     sample_interval=100,
+                                     verbose=True):
 
-    Parameters
-    ----------
-    X_train : np.array of shape=(n_samples, dim_input_d)
-        Real samples to train with.
+    Train the Generative Adversarial Network with given samples.
 
-    iterations : int
-        Number of iterations to use for training.
+        Parameters
+        ----------
+        X_train : np.array of shape=(n_samples, dim_input_d)
+            Real samples to train with.
 
-    batch_size : int, default=64
-        Number of samples in each batch, 1 batch is used per iteration.
+        iterations : int
+            Number of iterations to use for training.
 
-    k : int, default=1
-        Number of discriminator updates per generator update.
+        batch_size : int, default=64
+            Number of samples in each batch, 1 batch is used per iteration.
 
-    sample_interval : int, default=100
-        Iteration interval at which to output randomly generated
-        results of generator.
+        k : int, default=1
+            Number of discriminator updates per generator update.
 
-    verbose : boolean, default=True
-        If verbose is set, print current status.
+        sample_interval : int, default=100
+            Iteration interval at which to output randomly generated
+            results of generator.
+
+        verbose : boolean, default=True
+            If verbose is set, print current status.
 ```
 
 #### generate()
-```python
-Generate output from given noise.
+```
+generate(self, noise=None, amount=5):
 
-    Parameters
-    ----------
-    noise : np.array of shape=(n_samples, dim_input_generator), optional
-        If given, generate output from given noise.
+    Generate output from given noise.
 
-    amount : int, default=5
-        If no noise is given, generate the amount of output data given
-        by this integer.
+        Parameters
+        ----------
+        noise : np.array of shape=(n_samples, dim_input_generator), optional
+            If given, generate output from given noise.
 
-    Returns
-    -------
-    result : np.array of shape=(n_samples, dim_output)
-        Generated data.
+        amount : int, default=5
+            If no noise is given, generate the amount of output data given
+            by this integer.
+
+        Returns
+        -------
+        result : np.array of shape=(n_samples, dim_output)
+            Generated data.
 ```
 
 #### save()
-```python
-Saves weights of GAN to outfile.
+```
+save(self, out_gen, out_dis, out_com):
 
-    Parameters
-    ----------
-    out_gen : string
-        Path to output file for generator.
+    Saves weights of GAN to outfile.
 
-    out_dis : string
-        Path to output file for discriminator.
+        Parameters
+        ----------
+        out_gen : string
+            Path to output file for generator.
 
-    out_com : string
-        Path to output file for combined model.
+        out_dis : string
+            Path to output file for discriminator.
+
+        out_com : string
+            Path to output file for combined model.
 ```
 
 #### load()
-```python
-Loads weights of GAN from infile.
+```
+load(self, in_gen, in_dis, in_com):
 
-    Parameters
-    ----------
-    in_gen : string
-        Path to input file for generator.
+    Loads weights of GAN from infile.
 
-    in_dis : string
-        Path to input file for discriminator.
+        Parameters
+        ----------
+        in_gen : string
+            Path to input file for generator.
 
-    in_com : string
-        Path to input file for combined model.
+        in_dis : string
+            Path to input file for discriminator.
+
+        in_com : string
+            Path to input file for combined model.
 ```
 
 #### sample_images()
-```python
-Generate width x height images and write them to outfile.
+```
+sample_images(self, outfile, data=None, width=5, height=5):
 
-    Parameters
-    ----------
-    outfile : string
-        Path to outfile to write image to.
+    Generate width x height images and write them to outfile.
 
-    width : int, default=5
-        Number of generated images in width of output figure.
+        Parameters
+        ----------
+        outfile : string
+            Path to outfile to write image to.
 
-    height : int, default=5
-        Number of generated images in height of output figure.
+        width : int, default=5
+            Number of generated images in width of output figure.
+
+        height : int, default=5
+            Number of generated images in height of output figure.
 ```
 
 ### GAN Extensions
