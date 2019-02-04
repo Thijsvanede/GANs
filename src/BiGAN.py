@@ -19,7 +19,7 @@ class BiGAN(GAN):
     def __init__(self, dim_input_g=100,
                        dim_input_d=(28, 28),
                        optimizer=Adam(beta_1=0.5)):
-        """Generative Adversarial Network.
+        """Bidirectional Generative Adversarial Network.
 
             Parameters
             ----------
@@ -188,7 +188,7 @@ class BiGAN(GAN):
                              k=1,
                              sample_interval=100,
                              verbose=True):
-        """Train the Generative Adversarial Network with given samples.
+        """Train the BiGAN with given samples.
 
             Parameters
             ----------
