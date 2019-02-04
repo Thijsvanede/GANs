@@ -145,10 +145,11 @@ class GAN(object):
     #                       GAN training/generating                        #
     ########################################################################
 
-    def train(self, X_train, iterations, batch_size=64,
-                                         k=1,
-                                         sample_interval=100,
-                                         verbose=True):
+    def train(self, X_train, iterations=1000,
+                             batch_size=64,
+                             k=1,
+                             sample_interval=100,
+                             verbose=True):
         """Train the Generative Adversarial Network with given samples.
 
             Parameters
@@ -156,7 +157,7 @@ class GAN(object):
             X_train : np.array of shape=(n_samples, dim_input_d)
                 Real samples to train with.
 
-            iterations : int
+            iterations : int, default=1000
                 Number of iterations to use for training.
 
             batch_size : int, default=64
