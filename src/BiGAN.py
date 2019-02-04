@@ -280,4 +280,4 @@ if __name__ == '__main__':
 
     gan = BiGAN(dim_input_g=2, dim_input_d=(28, 28))
     gan.train(X_train, iterations=10000, sample_interval=100)
-    gan.save('../saved/GAN_g.h5', '../saved/GAN_d.h5', '../saved/GAN_c.h5')
+    gan.save('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
