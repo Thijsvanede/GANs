@@ -55,24 +55,21 @@ class BiGAN(GAN):
             result : keras.model
                 Model to encode data to latent space from original input.
             """
-        # Initialise model
-        model = Sequential()
-
-        # Add model layers
-        model.add(Flatten(input_shape=self.dim_input_d))
-        model.add(Dense(512))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(512))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(self.dim_input_g))
-
         # Set input shape
         input = Input(shape=self.dim_input_d)
 
+        # Add model layers
+        model = Flatten(input_shape=self.dim_input_d)(input)
+        model = Dense(512)(model)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = Dense(512)(model)
+        model = LeakyReLU(alpha=0.2)(model)
+        model = BatchNormalization(momentum=0.8)(model)
+        model = Dense(self.dim_input_g)(model)
+
         # Return keras model: input -> encoder -> output
-        return Model(input, model(input), name="Encoder")
+        return Model(input, model, name="Encoder")
 
     def build_generator(self):
         """Build keras generator model.
@@ -199,7 +196,7 @@ class BiGAN(GAN):
                                self.__class__.__name__, 0))
 
         # Rescale -1 to 1
-        X_train = X_train / (X_train.max() / 2.) - 1.
+        X_train = 2 * ((X_train - X_train.min()) / (X_train.max() - X_train.min()) - 0.5)
 
         # Adversarial ground truths
         y_real = np.ones ((batch_size, 1))

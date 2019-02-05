@@ -179,7 +179,7 @@ class GAN(object):
                                self.__class__.__name__, 0))
 
         # Rescale -1 to 1
-        X_train = X_train / (X_train.max() / 2.) - 1.
+        X_train = 2 * ((X_train - X_train.min()) / (X_train.max() - X_train.min()) - 0.5)
 
         # Adversarial ground truths
         y_real = np.ones ((batch_size, 1))
