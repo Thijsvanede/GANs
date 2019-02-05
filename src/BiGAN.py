@@ -71,7 +71,7 @@ class BiGAN(GAN):
         input = Input(shape=self.dim_input_d)
 
         # Return keras model: input -> encoder -> output
-        return Model(input, model(input))
+        return Model(input, model(input), name="Encoder")
 
     def build_generator(self):
         """Build keras generator model.
@@ -98,7 +98,7 @@ class BiGAN(GAN):
         noise = Input(shape=(self.dim_input_g,))
 
         # Return keras model: noise -> generator -> output
-        return Model(noise, model(noise))
+        return Model(noise, model(noise), name="Generator")
 
     def build_discriminator(self):
         """Build keras discriminator model.
@@ -128,7 +128,7 @@ class BiGAN(GAN):
         model = Dropout(0.5)(model)
         output = Dense(1, activation="sigmoid")(model)
 
-        return Model([latent, data], output)
+        return Model([latent, data], output, name="Discriminator")
 
     def build_combined(self):
         """Build model by combining Generator and Discriminator.
@@ -157,7 +157,7 @@ class BiGAN(GAN):
 
         # The combined model (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        return Model([g_latent, e_data], [fake, real])
+        return Model([g_latent, e_data], [fake, real], name="Combined")
 
 
     ########################################################################
