@@ -7,13 +7,12 @@ from keras.optimizers import Adam
 
 from GAN import GAN
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 class BiGAN(GAN):
 
     ########################################################################
-    #                    Generative Adversarial Network                    #
+    #             Bidirectional Generative Adversarial Network             #
     ########################################################################
 
     def __init__(self, dim_input_g=100,
@@ -36,29 +35,11 @@ class BiGAN(GAN):
         self.dim_input_d = dim_input_d
         self.dim_input_g = dim_input_g
 
-        # Build and compile the discriminator
-        self.discriminator = self.build_discriminator()
-        self.discriminator.compile(
-            loss='binary_crossentropy',
-            optimizer=optimizer,
-            metrics=['accuracy']
-        )
-
-        # Build the generator
-        self.generator = self.build_generator()
-
         # Build the encoder
-        self.encoder   = self.build_encoder()
+        self.encoder = self.build_encoder()
 
-        # Build and compile the combined model
-        self.combined = self.build_combined()
-        self.combined.compile(
-            loss=['binary_crossentropy', 'binary_crossentropy'],
-            optimizer=optimizer
-        )
-
-        # Define accuracy queue for printing progress
-        self.accuracy_queue = [100.]*50
+        # Build the rest of the network
+        super(BiGAN, self).__init__(dim_input_g, dim_input_d, optimizer)
 
 
     ########################################################################
