@@ -43,7 +43,7 @@ class GAN(object):
         )
 
         # Build the generator
-        self.generator = self.build_generator()
+        self.generator_data = self.build_generator()
 
         # Build and compile the combined model
         self.combined = self.build_combined()
@@ -128,7 +128,7 @@ class GAN(object):
         # Build the combined model
         # The generator takes noise as input and generates fake data
         input_g   = Input(shape=(self.dim_input_g,))
-        generated = self.generator(input_g)
+        generated = self.generator_data(input_g)
 
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
@@ -198,7 +198,7 @@ class GAN(object):
                 # Get random noise samples
                 noise = np.random.normal(0, 1, (batch_size, self.dim_input_g))
                 # Generate batch of fake data
-                X_fake = self.generator.predict(noise)
+                X_fake = self.generator_data.predict(noise)
 
                 # Select a random minibatch of images
                 minibatch = np.random.randint(0, X_train.shape[0], batch_size)
@@ -251,7 +251,7 @@ class GAN(object):
         if noise is None:
             noise = np.random.normal(0, 1, (amount, self.dim_input_g))
         # Return prediction
-        return self.generator.predict(noise)
+        return self.generator_data.predict(noise)
 
 
     ########################################################################
@@ -273,7 +273,7 @@ class GAN(object):
                 Path to output file for combined model.
             """
         # Save weights to outfiles
-        self.generator    .save_weights(out_gen)
+        self.generator_data    .save_weights(out_gen)
         self.discriminator.save_weights(out_dis)
         self.combined     .save_weights(out_com)
 
@@ -292,7 +292,7 @@ class GAN(object):
                 Path to input file for combined model.
             """
         # Load weights from infiles
-        self.generator    .load_weights(in_gen)
+        self.generator_data    .load_weights(in_gen)
         self.discriminator.load_weights(in_dis)
         self.combined     .load_weights(in_com)
 

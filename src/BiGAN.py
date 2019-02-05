@@ -146,7 +146,7 @@ class BiGAN(GAN):
         # Build the combined model
         # The generator takes noise as input and generates fake data
         g_latent = Input(shape=(self.dim_input_g,))
-        g_data   = self.generator(g_latent)
+        g_data   = self.generator_data(g_latent)
 
         # Encode data to latent space
         e_data   = Input(shape=self.dim_input_d)
@@ -218,7 +218,7 @@ class BiGAN(GAN):
                 # Get random noise samples
                 z_fake = np.random.normal(0, 1, (batch_size, self.dim_input_g))
                 # Generate batch of fake data
-                X_fake = self.generator.predict(z_fake)
+                X_fake = self.generator_data.predict(z_fake)
 
                 # Select a random minibatch of images
                 minibatch = np.random.randint(0, X_train.shape[0], batch_size)
