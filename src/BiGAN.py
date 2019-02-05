@@ -7,6 +7,7 @@ from keras.optimizers import Adam
 
 from GAN import GAN
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 class BiGAN(GAN):
@@ -252,6 +253,52 @@ class BiGAN(GAN):
                 self.sample_images("../images/{}/{}.png".format(
                                    self.__class__.__name__, iteration))
 
+    ########################################################################
+    #                        Visualisation methods                         #
+    ########################################################################
+
+    def plot_latent(self, X, y=None, output=None):
+        """Plot X when mapped to latent space.
+
+            Parameters
+            ----------
+            X : torch.Tensor of shape(n_samples, dim_input)
+               Input variables to propagate through the network.
+
+            y : torch.Tensor of shape(n_samples,), optional
+               Labels of x, if given show the labels of x.
+
+            output : string, optional
+               If given write image to output file.
+            """
+        # Apply encoding layer
+        X = self.encoder.predict(X)
+        # Convert to numpy array
+        y = np.zeros(X.shape[0]) if y is None else y
+
+        # Raise warning if latent space has too many dimensions.
+        if X.shape[1] != 2:
+            warnings.warn("Latent space has dimension {}. "
+                          "Reducing dimension to 2 using PCA.".format(
+                          X.shape[1]), RuntimeWarning)
+
+            # Reduce to 2 dimensions
+            X = PCA(n_components=2).fit_transform(X)
+
+        # Plot each label as a specific colour
+        for y_ in np.unique(y):
+            # Get samples from x with given label
+            X_ = X[y == y_]
+            # Plot samples from x
+            plt.scatter(X_[:, 0], X_[:, 1], label=y_)
+
+        # Show plot
+        plt.legend()
+        if output is None:
+            plt.show()
+        else:
+            plt.savefig(output)
+
 
 if __name__ == '__main__':
     # Load the dataset
@@ -260,5 +307,7 @@ if __name__ == '__main__':
     #(X_train, y_train), (X_test, y_test) = cifar10.load_data()
 
     gan = BiGAN(dim_input_g=2, dim_input_d=(28, 28))
-    gan.train(X_train, iterations=10000, sample_interval=100)
-    gan.save('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
+    #gan.train(X_train, iterations=10000, sample_interval=100)
+    #gan.save('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
+    gan.load('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
+    gan.plot_latent(X_test, y_test)
