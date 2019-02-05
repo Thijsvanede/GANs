@@ -88,7 +88,7 @@ class GAN(object):
         noise = Input(shape=(self.dim_input_g,))
 
         # Return keras model: noise -> generator -> output
-        return Model(noise, model(noise))
+        return Model(noise, model(noise), name="Generator")
 
     def build_discriminator(self):
         """Build keras discriminator model.
@@ -114,7 +114,7 @@ class GAN(object):
         input   = Input(shape=self.dim_input_d)
 
         # Return keras model: input -> discriminator -> output
-        return Model(input, model(input))
+        return Model(input, model(input), name="Discriminator")
 
     def build_combined(self):
         """Build model by combining Generator and Discriminator.
@@ -138,7 +138,7 @@ class GAN(object):
 
         # The combined model (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        return Model(input_g, output_d)
+        return Model(input_g, output_d, name="Combined")
 
 
     ########################################################################
