@@ -1,7 +1,6 @@
 from keras.datasets import mnist
 from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
-from sklearn.metrics import classification_report
 from utils import split
 import numpy as np
 
@@ -107,9 +106,6 @@ if __name__ == "__main__":
     fp = np.logical_and(y_pred ==  1, y_test == -1).sum()
     fn = np.logical_and(y_pred == -1, y_test ==  1).sum()
 
-    # Compute metrics
-    print(tp, tn, fp, fn)
-
     # Print result
     print("""
 TP:  {}
@@ -117,5 +113,3 @@ TN:  {}
 FP:  {}
 FN:  {}
 ACC: {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn)))
-
-    print(classification_report(y_test, y_pred))
