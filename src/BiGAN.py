@@ -282,12 +282,23 @@ class BiGAN(GAN):
             # Reduce to 2 dimensions
             X = PCA(n_components=2).fit_transform(X)
 
-        # Plot each label as a specific colour
-        for y_ in np.unique(y):
-            # Get samples from x with given label
-            X_ = X[y == y_]
-            # Plot samples from x
-            plt.scatter(X_[:, 0], X_[:, 1], label=y_)
+        # Plot in case of single dimensional y
+        if y.ndim == 1:
+            # Plot each label as a specific colour
+            for y_ in np.unique(y):
+                # Get samples from x with given label
+                X_ = X[y == y_]
+                # Plot samples from x
+                plt.scatter(X_[:, 0], X_[:, 1], label=y_)
+
+        # Plot in case of multidimensional y
+        else:
+            # Plot each label as a specific colour
+            for y_ in np.unique(y, axis=0):
+                # Get samples from x with given label
+                X_ = X[(y == y_).all(axis=1)]
+                # Plot samples from x
+                plt.scatter(X_[:, 0], X_[:, 1], label=y_)
 
         # Show plot
         plt.legend()
