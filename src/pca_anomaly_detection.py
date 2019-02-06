@@ -1,6 +1,7 @@
 from keras.datasets import mnist
 from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
+from sklearn.metrics import f1_score
 from utils import split
 import numpy as np
 
@@ -112,4 +113,5 @@ TP:  {}
 TN:  {}
 FP:  {}
 FN:  {}
-ACC: {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn)))
+ACC: {}
+F1 : {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn), f1_score(y_test, y_pred)))
