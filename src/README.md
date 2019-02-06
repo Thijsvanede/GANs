@@ -18,3 +18,6 @@ Equivalent to NoBiGAN3 but enforces class labels by including hybrid tuple (Gd(E
 
 # NoBiGAN5
 Equivalent to NoBiGAN3 but enforces labels by choosing distribution centres
+
+# NoBiGAN6
+Equivalent to NoBiGAN 3 but uses a one-hot encoded representation of labels.
