@@ -1,4 +1,7 @@
-def split(self, X, y, ratio=0.8, random_state=36):
+from sklearn.utils import check_random_state
+import numpy as np
+
+def split(X, y, ratio=0.8, random_state=36):
     """Randomly select classes from y to include in training.
 
         Parameters
@@ -44,7 +47,7 @@ def split(self, X, y, ratio=0.8, random_state=36):
     exclude = classes[~np.isin(classes, include)]
 
     # Get indices of data to include
-    indices = np.isin(y_train, include)
+    indices = np.isin(y, include)
 
     # Return result
     return X[indices], y[indices], include, exclude
