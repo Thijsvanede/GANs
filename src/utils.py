@@ -51,3 +51,25 @@ def split(X, y, ratio=0.8, random_state=36):
 
     # Return result
     return X[indices], y[indices], include, exclude
+
+def scale(X, min=0, max=1):
+    """Scale X to given range.
+
+        Parameters
+        ----------
+        X : np.array of shape=(n_samples, n_features)
+            Data to scale.
+
+        min : float, default = 0
+            Minimum value to scale to.
+
+        max : float, default = 1
+            Maximum value to scale to.
+
+        Returns
+        -------
+        result : np.array of shape=(n_samples, n_features)
+            Scaled data.
+        """
+    # Scale data to min - max
+    return (X - X.min()) / (X.max() - X.min()) * (max - min) + min

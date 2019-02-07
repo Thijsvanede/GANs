@@ -2,7 +2,7 @@ from keras.datasets import mnist
 from sklearn.metrics import f1_score
 
 from BiGAN import BiGAN
-from utils import split
+from utils import scale, split
 import numpy as np
 
 class RBNoBiGAN(BiGAN):
@@ -12,7 +12,22 @@ class RBNoBiGAN(BiGAN):
     ########################################################################
 
     def predict(self, X, threshold=0.8):
-        """Predict """
+        """Predict whether samples in X ar anomalous based on reconstruction
+            performance of the BiGAN.
+
+            Parameters
+            ----------
+            X : np.array of shape=(n_samples, n_features)
+                Samples to predict.
+
+            threshold : float, default=0.8
+                Maximum MSE to be concidered normal.
+
+            Returns
+            -------
+            result : np.array of shape=(n_samples,)
+                Prediction of -1 (anomalous) or +1 (normal).
+            """
         # Rescale X to range -1 to 1
         X = 2 * ((X - X.min()) / (X.max() - X.min()) - 0.5)
         # Get latent representation of X
@@ -35,8 +50,8 @@ if __name__ == '__main__':
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
     # Rescale -1 to 1
-    X_train = X_train / (X_train.max() / 2.) - 1.
-    X_test  = X_test  / (X_test .max() / 2.) - 1.
+    X_train = scale(X_train, min=-1, max=1)
+    X_test  = scale(X_test , min=-1, max=1)
 
     # Split training data into known and unknown
     _, _, known, unknown = split(X_train, y_train)
