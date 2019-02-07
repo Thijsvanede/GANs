@@ -6,6 +6,7 @@ from keras.models import Sequential, Model
 from keras.optimizers import Adam
 
 from GAN import GAN
+from utils import scale
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -195,9 +196,6 @@ class BiGAN(GAN):
             self.sample_images("../images/{}/{}.png".format(
                                self.__class__.__name__, 0))
 
-        # Rescale -1 to 1
-        X_train = 2 * ((X_train - X_train.min()) / (X_train.max() - X_train.min()) - 0.5)
-
         # Adversarial ground truths
         y_real = np.ones ((batch_size, 1))
         y_fake = np.zeros((batch_size, 1))
@@ -294,7 +292,7 @@ class BiGAN(GAN):
         # Plot in case of multidimensional y
         else:
             # Plot each label as a specific colour
-            for y_ in np.unique(y, axis=0):
+            for y_ in reversed(np.unique(y, axis=0)):
                 # Get samples from x with given label
                 X_ = X[(y == y_).all(axis=1)]
                 # Plot samples from x
@@ -310,12 +308,18 @@ class BiGAN(GAN):
 
 if __name__ == '__main__':
     # Load the dataset
-
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
-    #(X_train, y_train), (X_test, y_test) = cifar10.load_data()
+
+    # Rescale -1 to 1
+    X_train = scale(X_train, min=-1, max=1)
+    X_test  = scale(X_test , min=-1, max=1)
+
+    from utils import split
+    # Select samples for training and novelty detection
+    X_train_selected, y_train_selected, known, unknown = split(X_train, y_train)
 
     gan = BiGAN(dim_input_g=2, dim_input_d=(28, 28))
     #gan.train(X_train, iterations=10000, sample_interval=100)
     #gan.save('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
     gan.load('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
-    gan.plot_latent(X_test, y_test)
+    gan.plot_latent(X_train_selected, y_train_selected, output='../images/BiGAN/latent.png')
