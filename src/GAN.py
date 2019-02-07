@@ -7,6 +7,7 @@ from keras.optimizers import Adam
 
 import matplotlib.pyplot as plt
 import numpy as np
+from utils import scale
 
 class GAN(object):
 
@@ -179,8 +180,8 @@ class GAN(object):
                                self.__class__.__name__, 0))
 
         # Rescale -1 to 1
-        X_train = 2 * ((X_train - X_train.min()) / (X_train.max() - X_train.min()) - 0.5)
-
+        X_train = scale(X_train, -1, 1)
+        
         # Adversarial ground truths
         y_real = np.ones ((batch_size, 1))
         y_fake = np.zeros((batch_size, 1))
@@ -322,7 +323,7 @@ class GAN(object):
             X_fake = data
 
         # Rescale images 0 - 1
-        X_fake = (X_fake - X_fake.min()) / (X_fake.max() - X_fake.min())
+        X_fake = scale(X_fake, 0, 1)
 
         # Create subplot
         fig, axs = plt.subplots(height, width)
@@ -382,9 +383,11 @@ Progress: [{p_str}{r_str}] {iteration:{length}}/{total} = {progress:>6.2f}%"""
 
 if __name__ == '__main__':
     # Load the dataset
-
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
-    #(X_train, y_train), (X_test, y_test) = cifar10.load_data()
+
+    # Scale data
+    X_train = scale(X_train, -1, 1)
+    X_test  = scale(X_test , -1, 1)
 
     gan = GAN(dim_input_g=2, dim_input_d=(28, 28))
     gan.train(X_train, iterations=10000, sample_interval=100)
