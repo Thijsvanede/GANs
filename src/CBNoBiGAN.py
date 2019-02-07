@@ -15,7 +15,7 @@ from sklearn.utils import check_random_state
 import matplotlib.pyplot as plt
 import numpy as np
 
-class NoBiGAN6(BiGAN):
+class CBNoBiGAN(BiGAN):
 
     ########################################################################
     #                 Novelty detection Bidirectional GAN                  #
@@ -349,8 +349,8 @@ if __name__ == '__main__':
     X_train = X_train / (X_train.max() / 2.) - 1.
     X_test  = X_test  / (X_test .max() / 2.) - 1.
 
-    # Create NoBiGAN6
-    gan = NoBiGAN6(dim_input_g=2, dim_input_l=10, dim_input_d=(28, 28))
+    # Create CBNoBiGAN
+    gan = CBNoBiGAN(dim_input_g=2, dim_input_l=10, dim_input_d=(28, 28))
 
     # Select samples for training and novelty detection
     X_train_selected, y_train_selected, included, excluded =\
@@ -373,7 +373,7 @@ if __name__ == '__main__':
     # Train with selected samples
     #gan.train(X_train_selected, y_train_selected, iterations=10000, sample_interval=100)
     # Save GAN
-    #gan.save('../saved/NoBiGAN6_g.h5', '../saved/NoBiGAN6_d.h5', '../saved/NoBiGAN6_c.h5')
+    #gan.save('../saved/CBNoBiGAN_g.h5', '../saved/CBNoBiGAN_d.h5', '../saved/CBNoBiGAN_c.h5')
     # Load GAN
-    gan.load('../saved/NoBiGAN6_g.h5', '../saved/NoBiGAN6_d.h5', '../saved/NoBiGAN6_c.h5')
+    gan.load('../saved/CBNoBiGAN_g.h5', '../saved/CBNoBiGAN_d.h5', '../saved/CBNoBiGAN_c.h5')
     gan.plot_latent(X_train_selected, y_train_selected)

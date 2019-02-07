@@ -5,7 +5,7 @@ from BiGAN import BiGAN
 from utils import split
 import numpy as np
 
-class NoBiGAN(BiGAN):
+class RBNoBiGAN(BiGAN):
 
     ########################################################################
     #                 Novelty detection Bidirectional GAN                  #
@@ -46,14 +46,14 @@ if __name__ == '__main__':
     y_train = 2*np.isin(y_train, known) - 1
     y_test  = 2*np.isin(y_test , known) - 1
 
-    # Create NoBiGAN
-    gan = NoBiGAN(dim_input_g=2, dim_input_d=(28, 28))
+    # Create RBNoBiGAN
+    gan = RBNoBiGAN(dim_input_g=2, dim_input_d=(28, 28))
     # Train with selected samples
     #gan.train(X_train_selected, iterations=10000, sample_interval=None)
     # Save GAN
-    #gan.save('../saved/NoBiGAN_g.h5', '../saved/NoBiGAN_d.h5', '../saved/NoBiGAN_c.h5')
+    #gan.save('../saved/RBNoBiGAN_g.h5', '../saved/RBNoBiGAN_d.h5', '../saved/RBNoBiGAN_c.h5')
     # Load GAN
-    gan.load('../saved/NoBiGAN_g.h5', '../saved/NoBiGAN_d.h5', '../saved/NoBiGAN_c.h5')
+    gan.load('../saved/RBNoBiGAN_g.h5', '../saved/RBNoBiGAN_d.h5', '../saved/RBNoBiGAN_c.h5')
 
     # Predict test samples
     y_pred = gan.predict(X_test, threshold=0.9)
