@@ -322,4 +322,4 @@ if __name__ == '__main__':
     #gan.train(X_train, iterations=10000, sample_interval=100)
     #gan.save('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
     gan.load('../saved/BiGAN_g.h5', '../saved/BiGAN_d.h5', '../saved/BiGAN_c.h5')
-    gan.plot_latent(X_train_selected, y_train_selected, output='../images/BiGAN/latent.png')
+    gan.plot_latent(X_test, y_test, output='../images/BiGAN/latent.png')
