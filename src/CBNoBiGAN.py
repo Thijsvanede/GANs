@@ -400,11 +400,11 @@ if __name__ == '__main__':
                                            np.sort(known), np.sort(unknown)))
 
     # Train with selected samples
-    gan.train(X_train_selected, y_train_selected, iterations=10000, sample_interval=100)
+    #gan.train(X_train_selected, y_train_selected, iterations=10000, sample_interval=100)
     # Save GAN
-    gan.save('../saved/CBNoBiGAN_g_test.h5', '../saved/CBNoBiGAN_d_test.h5', '../saved/CBNoBiGAN_c_test.h5')
+    #gan.save('../saved/CBNoBiGAN_g_test.h5', '../saved/CBNoBiGAN_d_test.h5', '../saved/CBNoBiGAN_c_test.h5')
     # Load GAN
-    gan.load('../saved/CBNoBiGAN_g_test.h5', '../saved/CBNoBiGAN_d_test.h5', '../saved/CBNoBiGAN_c_test.h5')
+    gan.load('../saved/CBNoBiGAN_g_50k.h5', '../saved/CBNoBiGAN_d_50k.h5', '../saved/CBNoBiGAN_c_50k.h5')
 
     # Predict test samples
     y_pred = gan.predict(X_train_selected, X_test)
@@ -424,4 +424,4 @@ FN:  {}
 ACC: {}
 F1 : {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn), f1_score(y_test, y_pred)))
 
-    gan.plot_latent(X_test, y_test_values)
+    gan.plot_latent(X_test, y_test_values, output='../images/CBNoBiGAN/latent.png')
