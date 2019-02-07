@@ -29,7 +29,7 @@ class RBNoBiGAN(BiGAN):
                 Prediction of -1 (anomalous) or +1 (normal).
             """
         # Rescale X to range -1 to 1
-        X = 2 * ((X - X.min()) / (X.max() - X.min()) - 0.5)
+        X = scale(X, min=-1, max=1)
         # Get latent representation of X
         z = self.encoder.predict(X)
         # Reconstruct output of X
