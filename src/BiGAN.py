@@ -298,7 +298,7 @@ class BiGAN(GAN):
                 # Get samples from x with given label
                 X_ = X[(y == y_).all(axis=1)]
                 # Plot samples from x
-                plt.scatter(X_[:, 0], X_[:, 1], label=y_)
+                plt.scatter(X_[:, 0], X_[:, 1], label=y_.argmax())
 
         # Show plot
         plt.legend()
