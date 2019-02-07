@@ -34,6 +34,10 @@ if __name__ == '__main__':
     # Load the dataset
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
+    # Rescale -1 to 1
+    X_train = X_train / (X_train.max() / 2.) - 1.
+    X_test  = X_test  / (X_test .max() / 2.) - 1.
+
     # Split training data into known and unknown
     _, _, known, unknown = split(X_train, y_train)
     X_train_known = X_train[np.isin(y_train, known)]
