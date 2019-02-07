@@ -10,7 +10,10 @@ from keras.utils import to_categorical
 
 from BiGAN import BiGAN
 from sklearn.decomposition import PCA
+from sklearn.ensemble import IsolationForest
+from sklearn.metrics import f1_score
 from sklearn.utils import check_random_state
+from utils import scale, split
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -228,9 +231,6 @@ class CBNoBiGAN(BiGAN):
             self.sample_images("../images/{}/{}.png".format(
                                self.__class__.__name__, 0))
 
-        # Rescale -1 to 1
-        X_train = X_train / (X_train.max() / 2.) - 1.
-
         # Adversarial ground truths
         y_real = np.ones ((batch_size, 1))
         y_fake = np.zeros((batch_size, 1))
@@ -286,59 +286,87 @@ class CBNoBiGAN(BiGAN):
     #                        Fit/prediction methods                        #
     ########################################################################
 
-    def predict(self, X, y=None):
-        return self.encoder(X)
-
-    def select(self, X, y, ratio=0.8, random_state=36):
-        """Randomly select classes from y to include in training.
+    def predict(self, X_train, X_test, random_state=42):
+        """Predict whether samples in X ar anomalous based on reconstruction
+            performance of the BiGAN.
 
             Parameters
             ----------
-            X : np.array of shape=(n_samples, n_features)
-                Data corresponding to given labels.
+            X_train : np.array of shape=(n_samples, n_features)
+                Samples to use for normal model.
 
-            y : np.array of shape=(n_samples,)
-                Labels corresponding to given data.
-
-            ratio : float, default=0.8
-                Ratio of labels to include in training set.
-
-            random_state : int, RandomState instance or None, optional, default:
-                36. If int, random_state is the seed used by the random number
-                generator; If RandomState instance, random_state is the random
+            X_test : np.array of shape=(n_samples, n_features)
+                Samples to predict.
 
             Returns
             -------
-            X : np.array of shape=(n_samples_selected, n_features)
-                Selected data samples
-
-            y : np.array of shape=(n_samples_selected)
-                Selected data labels
-
-            include : np.array of shape=(ratio*n_classes,)
-                Labels included in the training data
-
-            exclude : np.array of shape=((1-ratio)*n_classes,)
-                Labels excluded from training data
+            result : np.array of shape=(n_samples,)
+                Prediction of -1 (anomalous) or +1 (normal).
             """
-        # Create random state
-        rs = check_random_state(random_state)
+        # Get latent representation of X
+        z_train = self.encoder.predict(X_train)
+        z_test  = self.encoder.predict(X_test )
 
-        # Extract all classes from labels
-        classes = np.unique(y)
+        # Create detector
+        detector = IsolationForest(contamination="auto",
+                                   behaviour="new",
+                                   random_state=random_state)
 
-        # Crete the size of classes to include
-        size = int(ratio * classes.shape[0])
+        # Fit training, predict testing and return result
+        return detector.fit(z_train).predict(z_test)
 
-        # Randomly select classes to include and exclude
-        include = rs.choice(classes, size=size, replace=False)
-        exclude = classes[~np.isin(classes, include)]
 
-        # Get indices of data to include
-        indices = np.isin(y_train, include)
+    def generate_subsamples(self, amount=5, n_labels=8):
+        """Generate output from given noise.
 
-        # Return result
-        return X[indices], y[indices], include, exclude
+            Parameters
+            ----------
+            amount : int, default=5
+                If no noise is given, generate the amount of output data given
+                by this integer.
+
+            Returns
+            -------
+            result : np.array of shape=(n_samples, dim_output)
+                Generated data.
+            """
+        for i in range(10):
+            # Generate some random noise
+            noise = np.random.normal(0, 1, (100*amount, self.dim_input_g))
+
+            # Generate labels
+            labels = self.generator_label.predict(noise).argmax(axis=1)
+
+            if all(np.sum(labels == l) >= amount for l in np.unique(labels)) and\
+                np.unique(labels).shape[0] == n_labels:
+                break
+
+            if i == 9:
+                print('Unable to generate all labels')
+
+        # Generate data
+        data = self.generator_data.predict(noise)
+
+        # Pick amount random samples for each label
+        result = {}
+        for l in np.unique(labels):
+            indices   = np.argwhere(labels == l).flatten()
+            selected  = np.random.choice(indices, size=amount)
+            result[l] = data[selected]
+
+        # Create subplot
+        fig, axs = plt.subplots(len(result), amount)
+
+        for x, (label, data) in enumerate(sorted(result.items())):
+            axs[x, 0].set_ylabel(label, rotation=0, size='large')
+            for y, d in enumerate(data):
+                axs[x, y].imshow(d, cmap='gray')
+                axs[x, y].get_xaxis().set_visible(False)
+                axs[x, y].get_yaxis().set_ticks([])
+
+        fig.subplots_adjust(hspace=0)
+        plt.show()
+        exit()
 
 
 if __name__ == '__main__':
@@ -346,19 +374,20 @@ if __name__ == '__main__':
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
     # Rescale -1 to 1
-    X_train = X_train / (X_train.max() / 2.) - 1.
-    X_test  = X_test  / (X_test .max() / 2.) - 1.
+    X_train = scale(X_train, min=-1, max=1)
+    X_test  = scale(X_test , min=-1, max=1)
 
     # Create CBNoBiGAN
     gan = CBNoBiGAN(dim_input_g=2, dim_input_l=10, dim_input_d=(28, 28))
 
     # Select samples for training and novelty detection
-    X_train_selected, y_train_selected, included, excluded =\
-        gan.select(X_train, y_train)
+    X_train_selected, y_train_selected, known, unknown = split(X_train, y_train)
 
     # One-hot encode values
     y_train_selected = to_categorical(y_train_selected, num_classes=10)
-    y_test           = to_categorical(y_test          , num_classes=10)
+    #y_test           = to_categorical(y_test          , num_classes=10)
+    y_test_values = y_test
+    y_test  = 2*np.isin(y_test , known) - 1
 
     # Print which samples are selected
     print("""
@@ -368,12 +397,31 @@ if __name__ == '__main__':
                                            X_train.shape[0],
                                            (100*X_train_selected.shape[0]) /
                                            X_train.shape[0],
-                                           np.sort(included), np.sort(excluded)))
+                                           np.sort(known), np.sort(unknown)))
 
     # Train with selected samples
-    #gan.train(X_train_selected, y_train_selected, iterations=10000, sample_interval=100)
+    gan.train(X_train_selected, y_train_selected, iterations=10000, sample_interval=100)
     # Save GAN
-    #gan.save('../saved/CBNoBiGAN_g.h5', '../saved/CBNoBiGAN_d.h5', '../saved/CBNoBiGAN_c.h5')
+    gan.save('../saved/CBNoBiGAN_g_test.h5', '../saved/CBNoBiGAN_d_test.h5', '../saved/CBNoBiGAN_c_test.h5')
     # Load GAN
-    gan.load('../saved/CBNoBiGAN_g.h5', '../saved/CBNoBiGAN_d.h5', '../saved/CBNoBiGAN_c.h5')
-    gan.plot_latent(X_train_selected, y_train_selected)
+    gan.load('../saved/CBNoBiGAN_g_test.h5', '../saved/CBNoBiGAN_d_test.h5', '../saved/CBNoBiGAN_c_test.h5')
+
+    # Predict test samples
+    y_pred = gan.predict(X_train_selected, X_test)
+
+    # Evaluate detector
+    tp = np.logical_and(y_pred ==  1, y_test ==  1).sum()
+    tn = np.logical_and(y_pred == -1, y_test == -1).sum()
+    fp = np.logical_and(y_pred ==  1, y_test == -1).sum()
+    fn = np.logical_and(y_pred == -1, y_test ==  1).sum()
+
+    # Print result
+    print("""
+TP:  {}
+TN:  {}
+FP:  {}
+FN:  {}
+ACC: {}
+F1 : {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn), f1_score(y_test, y_pred)))
+
+    gan.plot_latent(X_test, y_test_values)
