@@ -316,7 +316,7 @@ class CB_AD_GAN(BiGAN):
         return detector.fit(z_train).predict(z_test)
 
 
-    def generate_subsamples(self, amount=5, n_labels=8):
+    def generate_samples_class(self, amount=5, n_labels=8):
         """Generate output from given noise.
 
             Parameters
