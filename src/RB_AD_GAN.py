@@ -2,7 +2,7 @@ from keras.datasets import mnist
 from sklearn.metrics import f1_score
 
 from BiGAN import BiGAN
-from utils import scale, split
+from utils import evaluate, scale, split
 import numpy as np
 
 class RB_AD_GAN(BiGAN):
@@ -75,16 +75,4 @@ if __name__ == '__main__':
     y_pred = gan.predict(X_test, threshold=0.8)
 
     # Evaluate detector
-    tp = np.logical_and(y_pred ==  1, y_test ==  1).sum()
-    tn = np.logical_and(y_pred == -1, y_test == -1).sum()
-    fp = np.logical_and(y_pred ==  1, y_test == -1).sum()
-    fn = np.logical_and(y_pred == -1, y_test ==  1).sum()
-
-    # Print result
-    print("""
-TP:  {}
-TN:  {}
-FP:  {}
-FN:  {}
-ACC: {}
-F1 : {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn), f1_score(y_test, y_pred)))
+    evaluate(y_test, y_pred)

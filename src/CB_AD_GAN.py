@@ -13,7 +13,7 @@ from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
 from sklearn.metrics import f1_score
 from sklearn.utils import check_random_state
-from utils import scale, split
+from utils import evaluate, scale, split
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -380,21 +380,22 @@ if __name__ == '__main__':
     # Select samples for training and novelty detection
     X_train_selected, y_train_selected, known, unknown = split(X_train, y_train)
 
-    # One-hot encode values
-    y_train_selected = to_categorical(y_train_selected, num_classes=10)
-    #y_test           = to_categorical(y_test          , num_classes=10)
-    y_test_values = y_test
+    # Mark labels as known (1) and unknown (-1)
+    y_train = 2*np.isin(y_train, known) - 1
     y_test  = 2*np.isin(y_test , known) - 1
+
+    # One-hot encode class labels
+    y_train_selected = to_categorical(y_train_selected, num_classes=10)
 
     # Print which samples are selected
     print("""
     Training using {}/{} = {:5.2f}% of samples.
     Including labels: {}
-    Excluding labels: {}\n\n\n\n""".format(X_train_selected.shape[0],
-                                           X_train.shape[0],
-                                           (100*X_train_selected.shape[0]) /
-                                           X_train.shape[0],
-                                           np.sort(known), np.sort(unknown)))
+    Excluding labels: {}""".format(X_train_selected.shape[0],
+                                   X_train.shape[0],
+                                   (100*X_train_selected.shape[0]) /
+                                   X_train.shape[0],
+                                   np.sort(known), np.sort(unknown)))
 
     # Create CB_AD_GAN
     gan = CB_AD_GAN(dim_input_g=2, dim_input_l=10, dim_input_d=(28, 28))
@@ -410,18 +411,4 @@ if __name__ == '__main__':
     y_pred = gan.predict(X_train_selected, X_test)
 
     # Evaluate detector
-    tp = np.logical_and(y_pred ==  1, y_test ==  1).sum()
-    tn = np.logical_and(y_pred == -1, y_test == -1).sum()
-    fp = np.logical_and(y_pred ==  1, y_test == -1).sum()
-    fn = np.logical_and(y_pred == -1, y_test ==  1).sum()
-
-    # Print result
-    print("""
-TP : {}
-TN : {}
-FP : {}
-FN : {}
-ACC: {}
-F1 : {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn), f1_score(y_test, y_pred)))
-
-    gan.plot_latent(X_test, y_test_values, output='../images/CB_AD_GAN/latent.png')
+    evaluate(y_test, y_pred)

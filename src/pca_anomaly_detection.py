@@ -91,31 +91,19 @@ if __name__ == "__main__":
     X_test  = X_test .reshape(X_test .shape[0], -1)
 
     # Split training data into known and unknown
-    _, _, known, unknown = split(X_train, y_train)
-    X_train_known = X_train[np.isin(y_train, known)]
+    X_train_selected, y_train_selected, known, unknown = split(X_train, y_train)
 
     # Mark labels as known (1) and unknown (-1)
     y_train = 2*np.isin(y_train, known) - 1
     y_test  = 2*np.isin(y_test , known) - 1
 
-    # Apply PCA detection
+    # Create PCA detection
     pca_detector = PCA_detector()
+
     # Train detector
-    pca_detector.fit(X_train_known)
+    pca_detector.fit(X_train_selected)
     # Apply detector
     y_pred = pca_detector.predict(X_test)
 
-    # Evaluate detector
-    tp = np.logical_and(y_pred ==  1, y_test ==  1).sum()
-    tn = np.logical_and(y_pred == -1, y_test == -1).sum()
-    fp = np.logical_and(y_pred ==  1, y_test == -1).sum()
-    fn = np.logical_and(y_pred == -1, y_test ==  1).sum()
-
-    # Print result
-    print("""
-TP:  {}
-TN:  {}
-FP:  {}
-FN:  {}
-ACC: {}
-F1 : {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn), f1_score(y_test, y_pred)))
+    # Evaluate detector    
+    evaluate(y_test, y_pred)

@@ -1,3 +1,4 @@
+from sklearn.metrics import f1_score
 from sklearn.utils import check_random_state
 import numpy as np
 
@@ -73,3 +74,32 @@ def scale(X, min=0, max=1):
         """
     # Scale data to min - max
     return (X - X.min()) / (X.max() - X.min()) * (max - min) + min
+
+def evaluate(y_true, y_pred):
+    """Prints evaluation report.
+
+        Parameters
+        ----------
+        y_true : np.array of shape=(n_samples,)
+            Actual values of data, -1 for unknown or 1 for known.
+
+        y_pred : np.array of shape=(n_samples,)
+            Predicted values of data, -1 for unknown or 1 for known.
+        """
+    # Compute True/False Positives/Negatives
+    tp = np.logical_and(y_pred ==  1, y_true ==  1).sum()
+    tn = np.logical_and(y_pred == -1, y_true == -1).sum()
+    fp = np.logical_and(y_pred ==  1, y_true == -1).sum()
+    fn = np.logical_and(y_pred == -1, y_true ==  1).sum()
+
+    # Print result
+    print()
+    print("Evaluation report")
+    print("--------------------------")
+    print("  True  Positives: {:>6}".format(tp))
+    print("  True  Negatives: {:>6}".format(tn))
+    print("  False Positives: {:>6}".format(fp))
+    print("  False Negatives: {:>6}".format(fn))
+    print("  Accuracy       : {:>.4f}".format((tp+tn)/(tp+tn+fp+fn)))
+    print("  F1-score       : {:>.4f}".format(f1_score(y_true, y_pred)))
+    print()
