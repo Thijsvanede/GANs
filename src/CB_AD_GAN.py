@@ -18,7 +18,7 @@ from utils import scale, split
 import matplotlib.pyplot as plt
 import numpy as np
 
-class CBNoBiGAN(BiGAN):
+class CB_AD_GAN(BiGAN):
 
     ########################################################################
     #                 Novelty detection Bidirectional GAN                  #
@@ -377,9 +377,6 @@ if __name__ == '__main__':
     X_train = scale(X_train, min=-1, max=1)
     X_test  = scale(X_test , min=-1, max=1)
 
-    # Create CBNoBiGAN
-    gan = CBNoBiGAN(dim_input_g=2, dim_input_l=10, dim_input_d=(28, 28))
-
     # Select samples for training and novelty detection
     X_train_selected, y_train_selected, known, unknown = split(X_train, y_train)
 
@@ -399,12 +396,15 @@ if __name__ == '__main__':
                                            X_train.shape[0],
                                            np.sort(known), np.sort(unknown)))
 
-    # Train with selected samples
+    # Create CB_AD_GAN
+    gan = CB_AD_GAN(dim_input_g=2, dim_input_l=10, dim_input_d=(28, 28))
+
+    # Train with selected samples - uncomment in case of retraining
     #gan.train(X_train_selected, y_train_selected, iterations=10000, sample_interval=100)
     # Save GAN
-    #gan.save('../saved/CBNoBiGAN_g_test.h5', '../saved/CBNoBiGAN_d_test.h5', '../saved/CBNoBiGAN_c_test.h5')
+    #gan.save('../saved/CB_AD_GAN_g_test.h5', '../saved/CB_AD_GAN_d_test.h5', '../saved/CB_AD_GAN_c_test.h5')
     # Load GAN
-    gan.load('../saved/CBNoBiGAN_g_50k.h5', '../saved/CBNoBiGAN_d_50k.h5', '../saved/CBNoBiGAN_c_50k.h5')
+    gan.load('../saved/CB_AD_GAN_g_50k.h5', '../saved/CB_AD_GAN_d_50k.h5', '../saved/CB_AD_GAN_c_50k.h5')
 
     # Predict test samples
     y_pred = gan.predict(X_train_selected, X_test)
@@ -417,11 +417,11 @@ if __name__ == '__main__':
 
     # Print result
     print("""
-TP:  {}
-TN:  {}
-FP:  {}
-FN:  {}
+TP : {}
+TN : {}
+FP : {}
+FN : {}
 ACC: {}
 F1 : {}""".format(tp, tn, fp, fn, (tp+tn)/(tp+tn+fp+fn), f1_score(y_test, y_pred)))
 
-    gan.plot_latent(X_test, y_test_values, output='../images/CBNoBiGAN/latent.png')
+    gan.plot_latent(X_test, y_test_values, output='../images/CB_AD_GAN/latent.png')
