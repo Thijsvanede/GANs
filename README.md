@@ -1,6 +1,18 @@
 # GANs
 Implementation of various Generative Adversarial Networks (GANs) in Keras.
 
+## Dependencies
+The code is written in Python3 using the `Keras` library with a `tensorflow` backend. It uses the following libraries
+
+ * Keras
+ * Matplotlib
+ * Numpy
+ * Scikit-learn
+ 
+```bash
+pip3 install -U keras matplotlib numpy scikit-learn
+```
+
 ## Installation
 The repository can be cloned using
 ```bash
@@ -11,16 +23,19 @@ git clone https://github.com/Thijsvanede/GANs.git
 This repository is organised as follows:
 ```bash
 GANs
-├── data
-├── images
 ├── LICENSE
 ├── README.md
 ├── saved
 └── src
-    └── GAN.py
 ```
 
-## GAN
+The `src` directory contains the implementation of the different GANs discussed in the report.
+The `saved` directory contains trained models for reproduction of the results.
+
+## Extensible GAN framework
+For the implementation of the different GAN techniques see the [file](https://github.com/Thijsvanede/GANs/tree/master/src) `README.md` file in the `src` directory [here](https://github.com/Thijsvanede/GANs/tree/master/src).
+
+All GAN implementations are based on the Extensible GAN framework explained here.
 The `GAN` class is used for training and predicting of GANs. This class also acts as a superclass for all other GAN implementations. The class is easily extendible by overriding several key methods. This is described in the section [GAN extensions](#gan-extensions)
 
 ### API
