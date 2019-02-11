@@ -105,6 +105,5 @@ venv.bak/
 
 # Exclude images directory
 /images
-/saved
 /paper
 /experiments
