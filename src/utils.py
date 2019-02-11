@@ -2,7 +2,7 @@ from sklearn.metrics import f1_score
 from sklearn.utils import check_random_state
 import numpy as np
 
-def split(X, y, ratio=0.8, random_state=36):
+def split(X, y, ratio=0.8, random_state=36, verbose=True):
     """Randomly select classes from y to include in training.
 
         Parameters
@@ -19,6 +19,9 @@ def split(X, y, ratio=0.8, random_state=36):
         random_state : int, RandomState instance or None, optional, default:
             36. If int, random_state is the seed used by the random number
             generator; If RandomState instance, random_state is the random
+
+        verbose : boolean, default=True
+            If True print information about the labels that were selected.
 
         Returns
         -------
@@ -49,6 +52,16 @@ def split(X, y, ratio=0.8, random_state=36):
 
     # Get indices of data to include
     indices = np.isin(y, include)
+    
+    # Print which samples are selected in case verbose is True
+    if verbose:
+        print()
+        print("Split report")
+        print("--------------------------------")
+        print("  Known samples {}/{} = {:5.2f}%".format(indices.sum(), X.shape[0], 100*indices.sum()/X.shape[0]))
+        print("  Known   labels: {}".format(np.sort(include)))
+        print("  UnKnown labels: {}".format(np.sort(exclude)))
+        print()
 
     # Return result
     return X[indices], y[indices], include, exclude

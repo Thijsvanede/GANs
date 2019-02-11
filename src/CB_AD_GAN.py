@@ -387,16 +387,6 @@ if __name__ == '__main__':
     # One-hot encode class labels
     y_train_selected = to_categorical(y_train_selected, num_classes=10)
 
-    # Print which samples are selected
-    print("""
-    Training using {}/{} = {:5.2f}% of samples.
-    Including labels: {}
-    Excluding labels: {}""".format(X_train_selected.shape[0],
-                                   X_train.shape[0],
-                                   (100*X_train_selected.shape[0]) /
-                                   X_train.shape[0],
-                                   np.sort(known), np.sort(unknown)))
-
     # Create CB_AD_GAN
     gan = CB_AD_GAN(dim_input_g=2, dim_input_l=10, dim_input_d=(28, 28))
 
