@@ -38,6 +38,9 @@ For the implementation of the different GAN techniques see the [file](https://gi
 All GAN implementations are based on the Extensible GAN framework explained here.
 The `GAN` class is used for training and predicting of GANs. This class also acts as a superclass for all other GAN implementations. The class is easily extendible by overriding several key methods. This is described in the section [GAN extensions](#gan-extensions)
 
+### GAN Extensions
+In order to extend the GAN with custom implementations, one can implement the `build_generator()` and `build_discriminator()` methods of the GAN subclass. These classes should return a `keras.model` of the desired generator and discriminator object respectively.
+
 ### API
 
 #### __init__()
@@ -166,6 +169,3 @@ sample_images(self, outfile, data=None, width=5, height=5):
         height : int, default=5
             Number of generated images in height of output figure.
 ```
-
-### GAN Extensions
-In order to extend the GAN with custom implementations, one can implement the `build_generator()` and `build_discriminator()` methods of the GAN subclass. These classes should return a `keras.model` of the desired generator and discriminator object respectively.
