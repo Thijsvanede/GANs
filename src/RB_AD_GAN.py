@@ -54,8 +54,7 @@ if __name__ == '__main__':
     X_test  = scale(X_test , min=-1, max=1)
 
     # Split training data into known and unknown
-    _, _, known, unknown = split(X_train, y_train)
-    X_train_known = X_train[np.isin(y_train, known)]
+    X_train_selected, y_train_selected, known, unknown = split(X_train, y_train)
 
     # Mark labels as known (1) and unknown (-1)
     y_train = 2*np.isin(y_train, known) - 1
